@@ -1,7 +1,12 @@
 var clientId;
 var clientPx = calculatePx();
+var clientsLoaded = false;
 var Clients = new Meteor.Collection('clients');
-Meteor.subscribe('clients');
+Meteor.subscribe('clients', loaded);
+
+function loaded(){
+  clientsLoaded = true;
+}
 
 Meteor.startup(function(){
   keepAlive();
@@ -44,14 +49,16 @@ function updateClientPx(){
 }
 
 function updateTotalPx(){
-  var clients = Clients.find().map(function(client){
-    return client.px;
-  });
+  if(clientsLoaded){
+    var clients = Clients.find().map(function(client){
+      return client.px;
+    });
 
-  var total = clients.reduce(function(a, b){
-    return a + b;
-  });
-  Session.set('totalPx', total);
+    var total = clients.reduce(function(a, b){
+      return a + b;
+    });
+    Session.set('totalPx', total);
+  }
 }
 
 window.onresize = function() {
