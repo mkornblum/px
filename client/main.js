@@ -1,4 +1,36 @@
-Clients = new Meteor.Collection('clients');
+var clientId;
+var clientPx = calculatePx();
+var Clients = new Meteor.Collection('clients');
+Meteor.subscribe('clients');
+
+Meteor.startup(function(){
+  keepAlive();
+});
+
+Meteor.setInterval(function(){
+  keepAlive();
+}, 3000);
+
+Template.hello.count = function () {
+  return Session.get('clientPx');
+};
+
+Template.hello.allCount = function(){
+  return Session.get('totalPx');
+};
+
+Template.hello.clientId = function(){
+  return Session.get('clientId');
+}
+
+function keepAlive(){
+  updateClientPx();
+  updateTotalPx();
+
+  Meteor.call('keepalive', Session.get('clientId'), Session.get('clientPx'), function(error, result){
+    Session.set('clientId', result);
+  });
+}
 
 function calculatePx(){
   var viewportWidth = document.documentElement.clientWidth;
@@ -8,28 +40,21 @@ function calculatePx(){
 
 function updateClientPx(){
   clientPx = calculatePx();
-  Clients.update({_id: clientId}, {px: clientPx});
+  Session.set('clientPx', clientPx);
 }
 
-var clientPx = calculatePx();
-var clientId = Clients.insert({px: clientPx});
+function updateTotalPx(){
+  var clients = Clients.find().map(function(client){
+    return client.px;
+  });
 
-Meteor.render(function(){
-  Template.hello.count = function () {
-    return Clients.findOne({_id: clientId}).px
-  };
-
-  Template.hello.allCount = function(){
-    clients = Clients.find().map(function(client){
-      return client.px;
-    });
-
-    return clients.reduce(function(a, b){
-      return a + b;
-    });
-  };
-});
+  var total = clients.reduce(function(a, b){
+    return a + b;
+  });
+  console.log('total px: '+total);
+  Session.set('totalPx', total);
+}
 
 window.onresize = function() {
-  updateClientPx();
+  keepAlive();
 }
