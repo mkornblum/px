@@ -51,7 +51,6 @@ function updateTotalPx(){
   var total = clients.reduce(function(a, b){
     return a + b;
   });
-  console.log('total px: '+total);
   Session.set('totalPx', total);
 }
 

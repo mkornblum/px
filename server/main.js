@@ -2,7 +2,6 @@ Clients = new Meteor.Collection('clients');
 
 Meteor.methods({
   keepalive: function (clientId, clientPx) {
-    console.log(arguments);
     id = clientId || Clients.insert({px: clientPx});
     Clients.update({_id: id}, {$set: {last_seen: (new Date()).getTime(), px: clientPx}});
     return id;
