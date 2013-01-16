@@ -1,20 +1,11 @@
+Meteor.subscribe('clients');
+
 var clientId;
 var clientPx = calculatePx();
-var clientsLoaded = false;
-var Clients = new Meteor.Collection('clients');
-Meteor.subscribe('clients', loaded);
-
-function loaded(){
-  clientsLoaded = true;
-}
 
 Meteor.startup(function(){
-  keepAlive();
+  clientId = Meteor.call('createClient', clientPx, createdSuccess);
 });
-
-Meteor.setInterval(function(){
-  keepAlive();
-}, 3000);
 
 Template.hello.count = function () {
   return Session.get('clientPx');
@@ -28,13 +19,53 @@ Template.hello.clientId = function(){
   return Session.get('clientId');
 }
 
-function keepAlive(){
+function watch(){
   updateClientPx();
-  updateTotalPx();
 
-  Meteor.call('keepalive', Session.get('clientId'), Session.get('clientPx'), function(error, result){
-    Session.set('clientId', result);
+  Meteor.autorun(function(){
+    Clients.find({}).observe({
+      added: function(doc, index){
+        var totalPx = calculateTotalPx();
+        Session.set('totalPx', totalPx);
+        console.log('added');
+        console.log(doc);
+      },
+      changed: function(newDoc, index, oldDoc){
+        var totalPx = calculateTotalPx();
+        Session.set('totalPx', totalPx);
+        console.log('changed');
+        console.log(newDoc);
+        console.log(oldDoc);
+      },
+      removed: function(doc, index){
+        var totalPx = calculateTotalPx();
+        Session.set('totalPx', totalPx);
+        console.log('removed');
+        console.log(doc);
+      }
+    });
   });
+}
+
+function calculateTotalPx(){
+  return Clients.find({}).map(function(client){
+    return client.clientPx;
+  }).reduce(function(a, b){
+    return a+b;
+  });
+}
+
+function createdSuccess(error, result){
+  if(!error){
+    clientId = result;
+    Session.set('clientId', clientId);
+
+    Meteor.setInterval(function(){
+      Meteor.call('keepalive', clientId);
+    }, 1500);
+
+    watch();
+  }
 }
 
 function calculatePx(){
@@ -46,21 +77,11 @@ function calculatePx(){
 function updateClientPx(){
   clientPx = calculatePx();
   Session.set('clientPx', clientPx);
+  Clients.update({_id: clientId}, {$set: {clientPx : clientPx}});
 }
 
-function updateTotalPx(){
-  if(clientsLoaded){
-    var clients = Clients.find().map(function(client){
-      return client.px;
-    });
+var handleResize = _.debounce(function(){
+  updateClientPx();
+}, 500);
 
-    var total = clients.reduce(function(a, b){
-      return a + b;
-    });
-    Session.set('totalPx', total);
-  }
-}
-
-window.onresize = function() {
-  keepAlive();
-}
+window.addEventListener('resize', handleResize, false);
