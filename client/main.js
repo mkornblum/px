@@ -48,9 +48,28 @@ function watch(){
 }
 
 function calculateTotalPx(){
-  return Clients.find({}).map(function(client){
+
+  var clientPxCollection = Clients.find({}).map(function(client){
     return client.clientPx;
-  }).reduce(function(a, b){
+  });
+
+  var divs = d3.select("body").selectAll("div").data(clientPxCollection);
+  divs.enter()
+    .append("div")
+    .attr("class", "bar")
+    .style("height", function(d) {
+      var barHeight = d / 3000;
+      return barHeight + "px";
+    });
+
+  divs.transition().duration(750).style("height", function(d) {
+    var barHeight = d / 3000;
+    return barHeight + "px";
+  });
+
+  divs.exit().remove();
+
+  return clientPxCollection.reduce(function(a, b){
     return a+b;
   });
 }
