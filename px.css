@@ -1,1 +1,8 @@
 /* CSS declarations go here */
+
+.bar {
+  background-color: #b4da55;
+  width: 30px;
+  float: left;
+  margin-right: 5px;
+}
