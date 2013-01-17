@@ -2,22 +2,26 @@ Meteor.subscribe('clients');
 
 var clientId;
 var clientPx = calculatePx();
+var color = d3.scale.category20();
+var diameter = 960,
+    format = d3.format(",d");
+
+var bubble = d3.layout.pack()
+  .sort(null)
+  .size([diameter, diameter])
+  .padding(1.5);
 
 Meteor.startup(function(){
   clientId = Meteor.call('createClient', clientPx, createdSuccess);
 });
 
 Template.hello.count = function () {
-  return Session.get('clientPx');
+  return format(Session.get('clientPx'));
 };
 
 Template.hello.allCount = function(){
-  return Session.get('totalPx');
+  return format(Session.get('totalPx'));
 };
-
-Template.hello.clientId = function(){
-  return Session.get('clientId');
-}
 
 function watch(){
   updateClientPx();
@@ -50,28 +54,37 @@ function watch(){
 function calculateTotalPx(){
 
   var clientPxCollection = Clients.find({}).map(function(client){
-    return client.clientPx;
+    return {value: client.clientPx};
   });
 
-  var divs = d3.select("body").selectAll("div").data(clientPxCollection);
-  divs.enter()
-    .append("div")
-    .attr("class", "bar")
-    .style("height", function(d) {
-      var barHeight = d / 3000;
-      return barHeight + "px";
-    });
+  var containerWidth = $('.container').width();
+  var visibleHeight = $(window).height();
+  diameter = containerWidth < visibleHeight ? containerWidth : visibleHeight;
+  bubble.size([diameter, diameter]);
 
-  divs.transition().duration(750).style("height", function(d) {
-    var barHeight = d / 3000;
-    return barHeight + "px";
-  });
+  bubbleNodes = bubble.nodes({children: clientPxCollection})
 
-  divs.exit().remove();
+  svg = d3.select("svg")
+    .attr('width', diameter)
+    .attr('height', diameter)
+    .selectAll("circle")
+    .data(bubbleNodes);
 
-  return clientPxCollection.reduce(function(a, b){
-    return a+b;
-  });
+  svg.enter()
+    .append("circle")
+    .attr("r", function(d) { return d.r; })
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .style("fill", function(d) { return color(d.r); })
+
+  svg.transition().duration(300)
+    .attr("r", function(d){
+      return d.r;
+    })
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .style("fill", function(d) { return color(d.r); });
+
+  svg.exit().remove();
+  return bubbleNodes[0].value;
 }
 
 function createdSuccess(error, result){
