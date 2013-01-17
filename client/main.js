@@ -2,6 +2,7 @@ Meteor.subscribe('clients');
 
 var clientId;
 var clientPx = calculatePx();
+var color = d3.scale.category20();
 
 Meteor.startup(function(){
   clientId = Meteor.call('createClient', clientPx, createdSuccess);
@@ -53,21 +54,22 @@ function calculateTotalPx(){
     return client.clientPx;
   });
 
-  var divs = d3.select("body").selectAll("div").data(clientPxCollection);
-  divs.enter()
-    .append("div")
-    .attr("class", "bar")
-    .style("height", function(d) {
-      var barHeight = d / 3000;
-      return barHeight + "px";
-    });
+  var svg = d3.select("svg").selectAll("circle").data(clientPxCollection);
 
-  divs.transition().duration(750).style("height", function(d) {
-    var barHeight = d / 3000;
-    return barHeight + "px";
-  });
+  svg.enter()
+    .append("circle")
+    .attr("r", function(d) { return d/5000; })
+    .attr("transform", function(d) { return "translate(" + d/10000 + "," + d/10000 + ")"; })
+    .style("fill", function(d) { return color(d/5000); })
 
-  divs.exit().remove();
+  svg.transition().duration(750)
+    .attr("r", function(d){
+      return d/5000;
+    })
+    .attr("transform", function(d) { return "translate(" + d/10000 + "," + d/10000 + ")"; })
+    .style("fill", function(d) { return color(d/5000); });
+
+  svg.exit().remove();
 
   return clientPxCollection.reduce(function(a, b){
     return a+b;
