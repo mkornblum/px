@@ -3,6 +3,13 @@ Meteor.subscribe('clients');
 var clientId;
 var clientPx = calculatePx();
 var color = d3.scale.category20();
+var diameter = 960,
+    format = d3.format(",d");
+
+var bubble = d3.layout.pack()
+  .sort(null)
+  .size([diameter, diameter])
+  .padding(1.5);
 
 Meteor.startup(function(){
   clientId = Meteor.call('createClient', clientPx, createdSuccess);
@@ -51,29 +58,31 @@ function watch(){
 function calculateTotalPx(){
 
   var clientPxCollection = Clients.find({}).map(function(client){
-    return client.clientPx;
+    return {value: client.clientPx};
   });
 
-  var svg = d3.select("svg").selectAll("circle").data(clientPxCollection);
+  svg = d3.select("svg")
+    .selectAll("circle")
+    .data(bubble.nodes({children: clientPxCollection}));
 
   svg.enter()
     .append("circle")
-    .attr("r", function(d) { return d/5000; })
-    .attr("transform", function(d) { return "translate(" + d/10000 + "," + d/10000 + ")"; })
-    .style("fill", function(d) { return color(d/5000); })
+    .attr("r", function(d) { return d.r; })
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .style("fill", function(d) { return color(d.r); })
 
   svg.transition().duration(750)
     .attr("r", function(d){
-      return d/5000;
+      return d.r;
     })
-    .attr("transform", function(d) { return "translate(" + d/10000 + "," + d/10000 + ")"; })
-    .style("fill", function(d) { return color(d/5000); });
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .style("fill", function(d) { return color(d.r); });
 
   svg.exit().remove();
 
-  return clientPxCollection.reduce(function(a, b){
-    return a+b;
-  });
+  // return clientPxCollection.reduce(function(a, b){
+  //    return a + b;
+  // });
 }
 
 function createdSuccess(error, result){
