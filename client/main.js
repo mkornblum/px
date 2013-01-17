@@ -23,10 +23,6 @@ Template.hello.allCount = function(){
   return format(Session.get('totalPx'));
 };
 
-Template.hello.clientId = function(){
-  return Session.get('clientId');
-}
-
 function watch(){
   updateClientPx();
 
