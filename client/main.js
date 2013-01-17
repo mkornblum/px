@@ -76,7 +76,7 @@ function calculateTotalPx(){
     .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
     .style("fill", function(d) { return color(d.r); })
 
-  svg.transition().duration(750)
+  svg.transition().duration(300)
     .attr("r", function(d){
       return d.r;
     })
