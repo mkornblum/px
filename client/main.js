@@ -16,11 +16,11 @@ Meteor.startup(function(){
 });
 
 Template.hello.count = function () {
-  return Session.get('clientPx');
+  return format(Session.get('clientPx'));
 };
 
 Template.hello.allCount = function(){
-  return Session.get('totalPx');
+  return format(Session.get('totalPx'));
 };
 
 Template.hello.clientId = function(){
