@@ -57,7 +57,13 @@ function calculateTotalPx(){
     return {value: client.clientPx};
   });
 
+  var containerWidth = $('.container').width();
+  var visibleHeight = $(window).height();
+  diameter = containerWidth < visibleHeight ? containerWidth : visibleHeight;
+  bubble.size([diameter, diameter]);
   svg = d3.select("svg")
+    .attr('width', diameter)
+    .attr('height', diameter)
     .selectAll("circle")
     .data(bubble.nodes({children: clientPxCollection}));
 
