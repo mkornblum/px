@@ -61,11 +61,14 @@ function calculateTotalPx(){
   var visibleHeight = $(window).height();
   diameter = containerWidth < visibleHeight ? containerWidth : visibleHeight;
   bubble.size([diameter, diameter]);
+
+  bubbleNodes = bubble.nodes({children: clientPxCollection})
+
   svg = d3.select("svg")
     .attr('width', diameter)
     .attr('height', diameter)
     .selectAll("circle")
-    .data(bubble.nodes({children: clientPxCollection}));
+    .data(bubbleNodes);
 
   svg.enter()
     .append("circle")
@@ -81,10 +84,7 @@ function calculateTotalPx(){
     .style("fill", function(d) { return color(d.r); });
 
   svg.exit().remove();
-
-  // return clientPxCollection.reduce(function(a, b){
-  //    return a + b;
-  // });
+  return bubbleNodes[0].value;
 }
 
 function createdSuccess(error, result){
