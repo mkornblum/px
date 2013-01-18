@@ -34,6 +34,24 @@ p {
     display: none;
   }
 
+  #info {
+    bottom: 4em;
+  }
+
+  .squares {
+    margin-top: 1em;
+  }
+}
+
+@media all and (max-width: 400px) {
+  .hints {
+    display: none;
+  }
+
+  #info {
+    bottom: 2em;
+  }
+
   .squares {
     margin-top: 1em;
   }
