@@ -109,7 +109,7 @@ function drawTree(collection, width, height){
     .attr("height", function(d) { return d.dy; })
     .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
     .style("fill", function(d) { return color(d.value); })
-    .style("stroke", function(d) { return border(d.value); })
+    .style("stroke", '#000000')
     .style("stroke-width", "10px");
 
   svg.transition().duration(300)
