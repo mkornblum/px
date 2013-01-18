@@ -74,7 +74,10 @@ function changeLayout(){
 function calculateTotalPx(){
 
   var clientPxCollection = Clients.find({}).map(function(client){
-    return {value: client.clientPx};
+    return {
+      value: client.clientPx,
+      currentClient: client._id == clientId
+    };
   });
 
   var containerWidth = $('.container').width();
