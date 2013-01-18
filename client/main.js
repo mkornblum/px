@@ -17,6 +17,13 @@ var tree = d3.layout.treemap()
   .size([diameter, diameter])
   .padding(1.5);
 
+var currentLayout = 'bubble';
+
+var layoutMap = {
+  'bubble' : drawBubble,
+  'tree' : drawTree
+}
+
 Meteor.startup(function(){
   createClient();
 });
@@ -124,6 +131,12 @@ function drawTree(collection, width, height){
   return treeNodes[0].value;
 }
 
+function changeLayout(){
+  currentLayout = this.value;
+  $('svg').empty();
+  calculateTotalPx();
+}
+
 function calculateTotalPx(){
 
   var clientPxCollection = Clients.find({}).map(function(client){
@@ -131,9 +144,9 @@ function calculateTotalPx(){
   });
 
   var containerWidth = $('.container').width();
-  var visibleHeight = $(window).height();
+  var visibleHeight = $(window).height() * .95;
 
-  return drawTree(clientPxCollection, containerWidth, visibleHeight);
+  return layoutMap[currentLayout](clientPxCollection, containerWidth, visibleHeight);
 }
 
 function createdSuccess(error, result){
@@ -145,6 +158,7 @@ function createdSuccess(error, result){
       keepAlive();
     }, 2000);
 
+    d3.selectAll(".layout-selector").on("change", changeLayout);
     watch();
   }
 }
