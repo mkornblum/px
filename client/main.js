@@ -17,6 +17,7 @@ var tree = d3.layout.treemap()
   .padding(1.5);
 
 var currentLayout = 'bubble';
+var keepAliveInterval;
 
 Meteor.startup(function(){
   createClient();
@@ -31,6 +32,7 @@ Template.hello.allCount = function(){
 };
 
 function createClient(){
+  Meteor.clearInterval(keepAliveInterval);
   clientId = Meteor.call('createClient', clientPx, createdSuccess);
 }
 
@@ -85,7 +87,7 @@ function createdSuccess(error, result){
     clientId = result;
     Session.set('clientId', clientId);
 
-    Meteor.setInterval(function(){
+    keepAliveInterval = Meteor.setInterval(function(){
       keepAlive();
     }, 2000);
 
