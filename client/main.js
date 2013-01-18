@@ -94,7 +94,7 @@ function createdSuccess(error, result){
 
     Meteor.setInterval(function(){
       Meteor.call('keepalive', clientId);
-    }, 1500);
+    }, 2000);
 
     watch();
   }
