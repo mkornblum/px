@@ -46,6 +46,9 @@ function watch(){
         console.log(oldDoc);
       },
       removed: function(doc, index){
+        if(doc._id == clientId){
+          createClient();
+        }
         var totalPx = calculateTotalPx();
         Session.set('totalPx', totalPx);
         console.log('removed');
