@@ -5,7 +5,8 @@ Meteor.publish("clients", function() {
 Meteor.methods({
   keepalive: function(clientId){
     Clients.update({_id: clientId},
-                   {$set: {last_seen: (new Date()).getTime()}});
+                   {$set: {last_seen: (new Date()).getTime()}},
+                   function(e){});
   },
 
   createClient: function(px, callback) {
