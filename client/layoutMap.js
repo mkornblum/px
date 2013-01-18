@@ -8,12 +8,13 @@ function drawBubble(collection, width, height){
   bubble.size([diameter, diameter]);
 
   var bubbleNodes = bubble.nodes({children: collection})
+  var filtered = bubbleNodes.filter(function(d){ return !d.children; });
 
   var svg = d3.select("svg")
     .attr('width', diameter)
     .attr('height', diameter)
     .selectAll("circle")
-    .data(bubbleNodes);
+    .data(filtered);
 
   svg.enter()
     .append("circle")
