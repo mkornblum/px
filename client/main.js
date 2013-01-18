@@ -60,6 +60,7 @@ function watch(){
 
 function changeLayout(){
   currentLayout = this.value;
+  $('.viz').toggleClass('squares');
   $('svg').empty();
   calculateTotalPx();
 }
@@ -73,8 +74,8 @@ function calculateTotalPx(){
     };
   });
 
-  var containerWidth = $('.container').width();
-  var visibleHeight = $(window).height() * .95;
+  var containerWidth = $('.viz').width();
+  var visibleHeight = $(window).height() * .90;
 
   return LayoutMap[currentLayout](clientPxCollection, containerWidth, visibleHeight);
 }

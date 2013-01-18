@@ -1,17 +1,19 @@
 <head>
   <title>px</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
 <body>
   <div class="container">
     {{> hello}}
-    <svg></svg>
-
+    <div class="viz">
+      <svg></svg>
+    </div>
   </div>
 </body>
 
 <template name="hello">
-  <div class="info">
+  <div id="info">
     <h1>px</h1>
     <p>
       You are lighting {{count}} pixels.
@@ -23,5 +25,12 @@
       <label><input class="layout-selector" type="radio" name="layout" value="bubble" checked>circles</label>
       <label><input class="layout-selector" type="radio" name="layout" value="tree">squares</label>
     </form>
+    <div class="hints">
+      <h2>hints</h2>
+      <p >
+        Shift your device's physical orientation or change your browser's screen size. Compare
+        your view with your neighbors'. Get more people involved.
+      </p>
+    </div>
   </div>
 </template>
