@@ -11,6 +11,13 @@ var bubble = d3.layout.pack()
   .size([diameter, diameter])
   .padding(1.5);
 
+var tree = d3.layout.treemap()
+  .sort(null)
+  .size([diameter, diameter])
+  .padding(1.5);
+
+var currentLayout = 'bubble';
+
 Meteor.startup(function(){
   createClient();
 });
@@ -58,40 +65,25 @@ function watch(){
   });
 }
 
+function changeLayout(){
+  currentLayout = this.value;
+  $('svg').empty();
+  calculateTotalPx();
+}
+
 function calculateTotalPx(){
 
   var clientPxCollection = Clients.find({}).map(function(client){
-    return {value: client.clientPx};
+    return {
+      value: client.clientPx,
+      currentClient: client._id == clientId
+    };
   });
 
   var containerWidth = $('.container').width();
-  var visibleHeight = $(window).height();
-  diameter = containerWidth < visibleHeight ? containerWidth : visibleHeight;
-  bubble.size([diameter, diameter]);
+  var visibleHeight = $(window).height() * .95;
 
-  bubbleNodes = bubble.nodes({children: clientPxCollection})
-
-  svg = d3.select("svg")
-    .attr('width', diameter)
-    .attr('height', diameter)
-    .selectAll("circle")
-    .data(bubbleNodes);
-
-  svg.enter()
-    .append("circle")
-    .attr("r", function(d) { return d.r; })
-    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-    .style("fill", function(d) { return color(d.r); })
-
-  svg.transition().duration(300)
-    .attr("r", function(d){
-      return d.r;
-    })
-    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-    .style("fill", function(d) { return color(d.r); });
-
-  svg.exit().remove();
-  return bubbleNodes[0].value;
+  return LayoutMap[currentLayout](clientPxCollection, containerWidth, visibleHeight);
 }
 
 function createdSuccess(error, result){
@@ -103,6 +95,7 @@ function createdSuccess(error, result){
       keepAlive();
     }, 2000);
 
+    d3.selectAll(".layout-selector").on("change", changeLayout);
     watch();
   }
 }
