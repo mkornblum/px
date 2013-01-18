@@ -2,19 +2,39 @@
 
 body {
   font-family: Helvetica, Arial, sans-serif;
-  background-color: #222;
+  background-color: #151515;
   color: #888;
+  font-size: 12px;
 }
 
-.container {
-  text-align: center;
-  width: 80%;
-  margin: 0 auto;
+p {
+  line-height: 1.4em;
 }
 
-.info {
+.viz {
+  width: 75%;
+  margin-left: 25%;
+}
+
+.squares {
+  width: 65%;
+  margin-top: 2em;
+}
+
+#info {
+  width: 20%;
   text-align: left;
   position: absolute;
-  top: 10px;
-  left: 10px;
+  left: 1em;
+  bottom: 1em;
+}
+
+@media all and (max-height: 400px) {
+  .hints {
+    display: none;
+  }
+
+  .squares {
+    margin-top: 1em;
+  }
 }

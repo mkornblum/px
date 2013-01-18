@@ -42,15 +42,10 @@ function watch(){
       added: function(doc, index){
         var totalPx = calculateTotalPx();
         Session.set('totalPx', totalPx);
-        console.log('added');
-        console.log(doc);
       },
       changed: function(newDoc, index, oldDoc){
         var totalPx = calculateTotalPx();
         Session.set('totalPx', totalPx);
-        console.log('changed');
-        console.log(newDoc);
-        console.log(oldDoc);
       },
       removed: function(doc, index){
         if(doc._id == clientId){
@@ -58,8 +53,6 @@ function watch(){
         }
         var totalPx = calculateTotalPx();
         Session.set('totalPx', totalPx);
-        console.log('removed');
-        console.log(doc);
       }
     });
   });
@@ -67,6 +60,7 @@ function watch(){
 
 function changeLayout(){
   currentLayout = this.value;
+  $('.viz').toggleClass('squares');
   $('svg').empty();
   calculateTotalPx();
 }
@@ -80,8 +74,8 @@ function calculateTotalPx(){
     };
   });
 
-  var containerWidth = $('.container').width();
-  var visibleHeight = $(window).height() * .95;
+  var containerWidth = $('.viz').width();
+  var visibleHeight = $(window).height() * .90;
 
   return LayoutMap[currentLayout](clientPxCollection, containerWidth, visibleHeight);
 }
