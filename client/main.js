@@ -12,7 +12,7 @@ var bubble = d3.layout.pack()
   .padding(1.5);
 
 Meteor.startup(function(){
-  clientId = Meteor.call('createClient', clientPx, createdSuccess);
+  createClient();
 });
 
 Template.hello.count = function () {
@@ -22,6 +22,10 @@ Template.hello.count = function () {
 Template.hello.allCount = function(){
   return format(Session.get('totalPx'));
 };
+
+function createClient(){
+  clientId = Meteor.call('createClient', clientPx, createdSuccess);
+}
 
 function watch(){
   updateClientPx();
@@ -42,6 +46,9 @@ function watch(){
         console.log(oldDoc);
       },
       removed: function(doc, index){
+        if(doc._id == clientId){
+          createClient();
+        }
         var totalPx = calculateTotalPx();
         Session.set('totalPx', totalPx);
         console.log('removed');
@@ -93,10 +100,20 @@ function createdSuccess(error, result){
     Session.set('clientId', clientId);
 
     Meteor.setInterval(function(){
-      Meteor.call('keepalive', clientId);
-    }, 1500);
+      keepAlive();
+    }, 2000);
 
     watch();
+  }
+}
+
+function keepAlive(){
+  var clients = Clients.find({_id: clientId}).fetch();
+  if(clients.length > 0){
+    Meteor.call('keepalive', clientId);
+  }
+  else{
+    createClient();
   }
 }
 
