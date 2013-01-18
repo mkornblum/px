@@ -3,10 +3,16 @@ Meteor.subscribe('clients');
 var clientId;
 var clientPx = calculatePx();
 var color = d3.scale.category20();
+var border = d3.scale.category20b();
 var diameter = 960,
     format = d3.format(",d");
 
 var bubble = d3.layout.pack()
+  .sort(null)
+  .size([diameter, diameter])
+  .padding(1.5);
+
+var tree = d3.layout.treemap()
   .sort(null)
   .size([diameter, diameter])
   .padding(1.5);
@@ -58,6 +64,41 @@ function watch(){
   });
 }
 
+function drawBubble(){
+
+}
+
+function drawTree(collection, width, height){
+  tree.size([width, height *.95]);
+  var treeNodes = tree.nodes({children: collection});
+
+  var svg = d3.select("svg")
+    .attr('width', width)
+    .attr('height', height *.95)
+    .selectAll("rect")
+    .data(treeNodes);
+
+  svg.enter()
+    .append("rect")
+    .attr("width", function(d) { return d.dx; })
+    .attr("height", function(d) { return d.dy; })
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .style("fill", function(d) { return color(d.value); })
+    .style("stroke", function(d) { return border(d.value); })
+    .style("stroke-width", "10px");
+
+  svg.transition().duration(300)
+    .attr("width", function(d){
+      return d.dx;
+    })
+    .attr('height', function(d) { return d.dy; })
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .style("fill", function(d) { return color(d.value); });
+
+  svg.exit().remove();
+  return treeNodes[0].value;
+}
+
 function calculateTotalPx(){
 
   var clientPxCollection = Clients.find({}).map(function(client){
@@ -70,28 +111,7 @@ function calculateTotalPx(){
   bubble.size([diameter, diameter]);
 
   bubbleNodes = bubble.nodes({children: clientPxCollection})
-
-  svg = d3.select("svg")
-    .attr('width', diameter)
-    .attr('height', diameter)
-    .selectAll("circle")
-    .data(bubbleNodes);
-
-  svg.enter()
-    .append("circle")
-    .attr("r", function(d) { return d.r; })
-    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-    .style("fill", function(d) { return color(d.r); })
-
-  svg.transition().duration(300)
-    .attr("r", function(d){
-      return d.r;
-    })
-    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-    .style("fill", function(d) { return color(d.r); });
-
-  svg.exit().remove();
-  return bubbleNodes[0].value;
+  return drawTree(clientPxCollection, containerWidth, visibleHeight);
 }
 
 function createdSuccess(error, result){

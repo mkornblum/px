@@ -7,9 +7,12 @@ body {
 }
 
 .container {
+  text-align: center;
+}
+
+.bubble {
   width: 80%;
   margin: 0 auto;
-  text-align: center;
 }
 
 .info {
