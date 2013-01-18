@@ -9,7 +9,7 @@ Meteor.methods({
                    function(e){});
   },
 
-  createClient: function(px, callback) {
+  createClient: function(px) {
     if(!px)
       throw new Meteor.Error(400, 'You need some px to create a client record');
 
