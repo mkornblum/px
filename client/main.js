@@ -64,8 +64,33 @@ function watch(){
   });
 }
 
-function drawBubble(){
+function drawBubble(collection, width, height){
+  diameter = width < height ? width : height;
+  bubble.size([diameter, diameter]);
 
+  var bubbleNodes = bubble.nodes({children: collection})
+
+  var svg = d3.select("svg")
+    .attr('width', diameter)
+    .attr('height', diameter)
+    .selectAll("circle")
+    .data(bubbleNodes);
+
+  svg.enter()
+    .append("circle")
+    .attr("r", function(d) { return d.r; })
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .style("fill", function(d) { return color(d.r); })
+
+  svg.transition().duration(300)
+    .attr("r", function(d){
+      return d.r;
+    })
+    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
+    .style("fill", function(d) { return color(d.r); });
+
+  svg.exit().remove();
+  return bubbleNodes[0].value;
 }
 
 function drawTree(collection, width, height){
@@ -107,10 +132,7 @@ function calculateTotalPx(){
 
   var containerWidth = $('.container').width();
   var visibleHeight = $(window).height();
-  diameter = containerWidth < visibleHeight ? containerWidth : visibleHeight;
-  bubble.size([diameter, diameter]);
 
-  bubbleNodes = bubble.nodes({children: clientPxCollection})
   return drawTree(clientPxCollection, containerWidth, visibleHeight);
 }
 
