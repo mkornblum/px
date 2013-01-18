@@ -3,7 +3,6 @@ Meteor.subscribe('clients');
 var clientId;
 var clientPx = calculatePx();
 var color = d3.scale.category20();
-var border = d3.scale.category20b();
 var diameter = 960,
     format = d3.format(",d");
 
